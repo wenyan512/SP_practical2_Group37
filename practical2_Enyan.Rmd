@@ -1,0 +1,166 @@
+---
+title: "SP practical 2"
+output: html_document
+date: '2022-10-15'
+---
+
+```{r}
+
+
+Pone <- function(n, k, strategy, nrep){
+  prisoners_num <- c(1:(2*n))
+  boxes_num <- c(1:(2*n))
+  # boxes_num <- sample(1:(2*n), 2*n, replace=FALSE)
+
+  curr_prisoner_num <- k # initial k
+  # count the number of the success that a person can find his/her number 
+  success_n <- 0
+  for (i in 1:nrep){
+    # every repeat time change the card number
+    cards_num <- sample(1:(2*n), 2*n, replace=FALSE)
+    # print(cards_num)
+    
+    ## for strategy 1 and strategy2
+    if (strategy == 1 || strategy == 2){
+      ## strategy 1
+      if (strategy==1){
+        # 1st open the boxes with their number read the card number in it 
+        k <- cards_num[which(boxes_num==curr_prisoner_num)]
+      }
+      ## strategy 2
+      if (strategy==2){
+        # starting from a randomly selected box
+        # a random box number that he/she will open 
+        random_box <- sample(1:(2*n),1)
+        # read the card number in this random box
+        k <- cards_num[which(boxes_num==random_box)]
+      }
+      # print('box number:')
+      # print(boxes_num[which(boxes_num==curr_prisoner_num)])
+      # print('card number:')
+      # print(cards_num[which(boxes_num==curr_prisoner_num)])
+      # print('--------------')
+      # if k is not their prisoner number
+      n_box_open <- 1
+      # when the number of boxes he open less than n
+      while (n_box_open<n){
+        if (k == curr_prisoner_num) {
+          success_n <- success_n+1
+          # print('---------------success------------------')
+          break;
+        }
+        if (k != curr_prisoner_num) {
+        # go to box number k, read the card num as new k
+        # print('box number:')
+        # print(k)
+        # print('card number:')
+        # print(cards_num[which(boxes_num==k)])
+        # print('--------------')
+        k <- cards_num[which(boxes_num==k)]
+        n_box_open <- n_box_open+1
+        }
+        # if (n_box_open==n) print('---------------fail------------------')
+      }
+    }
+    
+    ## for strategy 3
+    if (strategy==3){
+      # random n box numbers that a person will open
+      n_random_box <- sample(boxes_num, n, replace=FALSE)
+      # the card number list that contain all card number in the boxes he/she open according to the n_random_box
+      select_card_num <- cards_num[n_random_box]
+      # if the prison number in the select_card_num list
+      # which means one of he/she selected box contian a card with their prison number
+      if (curr_prisoner_num %in% select_card_num){
+        success_n <- success_n+1
+        # print('---------------success------------------')
+      }
+    }
+  }
+  # estimate the probability of a single prisoner succeeding in finding their number
+  prob <- success_n/nrep
+  return(prob)
+}
+
+
+n <- 5         # #prisoner:2n=10
+k <- 7           # prisoner’s number
+strategy <- 3   # strategy=1/2/3 corresponding to strategy 1, 2, and 3
+nrep <- 10000    # the number of replicate simulations to run in order to estimate the probability(10000 is a reasonable default)
+# a test for Pone function
+prob <- Pone(n, k, strategy, nrep)
+prob
+system.time(Pone(n, k, strategy, nrep))
+```
+
+```{r}
+# the probability of all prisoners finding their number
+Pall <- function(n, strategy, nrep){
+  prob <- 1
+  for (prison in prisoners_num){
+    # the probability of a single prisoner succeeding in finding their number
+    single_prob <- Pone(n, prison, strategy, nrep)
+    prob <- prob*single_prob
+  }  
+  return(prob)
+}
+
+n <- 5           # #prisoner:2n=10
+strategy <- 3    # strategy=1/2/3 corresponding to strategy 1, 2, and 3
+nrep <- 10000    # the number of replicate simulations to run in order to estimate the probability(10000 is a reasonable default)
+# a test for Pone function
+prob <- Pall(n, strategy, nrep)
+prob
+```
+
+```{r}
+# function implementation example
+nrep <- 10000    # the number of replicate simulations to run in order to estimate the probability(10000 is a reasonable default)
+
+## for n= 5
+n1 <- 5
+## for strategy 1
+# individual k=7 success probabilities under strategy 1
+n5_individualk_prob_1 <- Pone(n1, 7, 1, nrep); n5_individualk_prob_1
+# joint success probabilities under strategy 1
+n5_joint_success_prob_1 <- Pall(n1, 1, nrep); n5_joint_success_prob_1
+
+## for strategy 2
+# individual k=7 success probabilities under strategy 2
+n5_individualk_prob_2 <- Pone(n1, 7, 2, nrep); n5_individualk_prob_2
+# joint success probabilities under strategy 2
+n5_joint_success_prob_2 <- Pall(n1, 2, nrep); n5_joint_success_prob_2
+
+## for strategy 3
+# individual k=7 success probabilities under strategy 3
+n5_individualk_prob_3 <- Pone(n1, 7, 3, nrep); n5_individualk_prob_3
+# joint success probabilities under strategy 3
+n5_joint_success_prob_3 <- Pall(n1, 3, nrep); n5_joint_success_prob_3
+
+
+## for n= 50
+n2 <- 50
+## for strategy 1
+# individual k=7 success probabilities under strategy 1
+n50_individualk_prob_1 <- Pone(n2, 7, 1, nrep); n50_individualk_prob_1
+# joint success probabilities under strategy 1
+n50_joint_success_prob_1 <- Pall(n2, 1, nrep); n50_joint_success_prob_1
+
+## for strategy 2
+# individual k=7 success probabilities under strategy 2
+n50_individualk_prob_2 <- Pone(n2, 7, 2, nrep); n50_individualk_prob_2
+# joint success probabilities under strategy 2
+n50_joint_success_prob_2 <- Pall(n2, 2, nrep); n50_joint_success_prob_2
+
+## for strategy 3
+# individual k=7 success probabilities under strategy 3
+n50_individualk_prob_3 <- Pone(n2, 7, 3, nrep); n50_individualk_prob_3
+# joint success probabilities under strategy 3
+n50_joint_success_prob_3 <- Pall(n2, 3, nrep); n50_joint_success_prob_3
+
+```
+
+```{r}
+
+```
+
