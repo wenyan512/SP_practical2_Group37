@@ -5,18 +5,16 @@ date: '2022-10-15'
 ---
 
 ```{r}
-
-
 Pone <- function(n, k, strategy, nrep){
   prisoners_num <- c(1:(2*n))
   boxes_num <- c(1:(2*n))
   # boxes_num <- sample(1:(2*n), 2*n, replace=FALSE)
 
-  curr_prisoner_num <- k # initial k
+  curr_prisoner_num <- k # initial k: current prisoner number 
   # count the number of the success that a person can find his/her number 
   success_n <- 0
   for (i in 1:nrep){
-    # every repeat time change the card number
+    # every repeat time change the distribution of the card number
     cards_num <- sample(1:(2*n), 2*n, replace=FALSE)
     # print(cards_num)
     
@@ -25,7 +23,7 @@ Pone <- function(n, k, strategy, nrep){
       ## strategy 1
       if (strategy==1){
         # 1st open the boxes with their number read the card number in it 
-        k <- cards_num[which(boxes_num==curr_prisoner_num)]
+        k <- cards_num[curr_prisoner_num]
       }
       ## strategy 2
       if (strategy==2){
@@ -33,31 +31,40 @@ Pone <- function(n, k, strategy, nrep){
         # a random box number that he/she will open 
         random_box <- sample(1:(2*n),1)
         # read the card number in this random box
-        k <- cards_num[which(boxes_num==random_box)]
+        k <- cards_num[random_box]
       }
+      
       # print('box number:')
-      # print(boxes_num[which(boxes_num==curr_prisoner_num)])
+      # print(curr_prisoner_num)
       # print('card number:')
-      # print(cards_num[which(boxes_num==curr_prisoner_num)])
+      # print(k)
       # print('--------------')
-      # if k is not their prisoner number
-      n_box_open <- 1
-      # when the number of boxes he open less than n
+      
+      # each prisoner has n chances of opening a box
+      n_box_open <- 1 # has already open the box once and record the card number as k
+      
+      # when the number of boxes he/she open less than n
       while (n_box_open<n){
+        # if the card in the box they open is their prisoner number, they success
         if (k == curr_prisoner_num) {
           success_n <- success_n+1
           # print('---------------success------------------')
           break;
         }
+        # if k is not their prisoner number
         if (k != curr_prisoner_num) {
-        # go to box number k, read the card num as new k
-        # print('box number:')
-        # print(k)
-        # print('card number:')
-        # print(cards_num[which(boxes_num==k)])
-        # print('--------------')
-        k <- cards_num[which(boxes_num==k)]
-        n_box_open <- n_box_open+1
+        
+          # print('box number:')
+          # print(k)
+          # print('card number:')
+          # print(cards_num[k])
+          # print('--------------')  
+          
+          # go to box number k, read the card num as new k
+          k <- cards_num[k]
+          # count the number of the boxes they have already opened
+          n_box_open <- n_box_open+1
+        
         }
         # if (n_box_open==n) print('---------------fail------------------')
       }
@@ -83,14 +90,14 @@ Pone <- function(n, k, strategy, nrep){
 }
 
 
-n <- 5         # #prisoner:2n=10
-k <- 7           # prisoner’s number
-strategy <- 3   # strategy=1/2/3 corresponding to strategy 1, 2, and 3
-nrep <- 10000    # the number of replicate simulations to run in order to estimate the probability(10000 is a reasonable default)
-# a test for Pone function
-prob <- Pone(n, k, strategy, nrep)
+# n <- 5         # #prisoner:2n=10
+# k <- 7           # prisoner’s number
+# strategy <- 2   # strategy=1/2/3 corresponding to strategy 1, 2, and 3
+# nrep <- 10000    # the number of replicate simulations to run in order to estimate the probability(10000 is a reasonable default)
+# # a test for Pone function
+prob <- Pone(5, 7, 1, 1000)
 prob
-system.time(Pone(n, k, strategy, nrep))
+# system.time(Pone(1000, 7, 3, 1000))
 ```
 
 ```{r}
@@ -112,6 +119,87 @@ nrep <- 10000    # the number of replicate simulations to run in order to estima
 prob <- Pall(n, strategy, nrep)
 prob
 ```
+
+```{r}
+Pall <- function(n, strategy, nrep){
+  prisoners_num <- c(1:(2*n))
+  boxes_num <- c(1:(2*n))
+  success_n <- 0
+  for (i in 1:nrep){
+    # every repeat time change the card number
+    cards_num <- sample(1:(2*n), 2*n, replace=FALSE)
+    # print(cards_num)
+    
+    # count the number of prisoners who are sucessful finding their number
+    success_prisoner <- 0
+    for (prisoner_num in prisoners_num){
+      ## for strategy 1 and strategy2
+      if (strategy == 1 || strategy == 2){
+        ## strategy 1
+        if (strategy==1){
+          # 1st open the boxes with their number read the card number in it 
+          k <- cards_num[which(boxes_num==prisoner_num)]
+        }
+        ## strategy 2
+        if (strategy==2){
+          # starting from a randomly selected box
+          # a random box number that he/she will open 
+          random_box <- sample(1:(2*n),1)
+          # read the card number in this random box
+          k <- cards_num[which(boxes_num==random_box)]
+        }
+        # print('box number:')
+        # print(boxes_num[which(boxes_num==curr_prisoner_num)])
+        # print('card number:')
+        # print(cards_num[which(boxes_num==curr_prisoner_num)])
+        # print('--------------')
+        # if k is not their prisoner number
+        n_box_open <- 1
+        # when the number of boxes he open less than n
+        while (n_box_open<n){
+          if (k == prisoner_num) {
+            success_prisoner <- success_prisoner+1
+            # print('---------------success------------------')
+            break;
+          }
+          if (k != prisoner_num) {
+          # go to box number k, read the card num as new k
+          # print('box number:')
+          # print(k)
+          # print('card number:')
+          # print(cards_num[which(boxes_num==k)])
+          # print('--------------')
+          k <- cards_num[which(boxes_num==k)]
+          n_box_open <- n_box_open+1
+          }
+          # if (n_box_open==n) print('---------------fail------------------')
+        }
+      }
+      
+      ## for strategy 3
+      if (strategy==3){
+        # random n box numbers that a person will open
+        n_random_box <- sample(boxes_num, n, replace=FALSE)
+        # the card number list that contain all card number in the boxes he/she open according to the n_random_box
+        select_card_num <- cards_num[n_random_box]
+        # if the prison number in the select_card_num list
+        # which means one of he/she selected box contian a card with their prison number
+        if (prisoner_num %in% select_card_num){
+          success_prisoner <- success_prisoner+1
+          # print('---------------success------------------')
+        }
+      }
+    }
+    if (success_prisoner == (2*n)) success_n <- success_n + 1
+  }
+  return(success_n/nrep)
+}
+
+Pall(5,3,10000)
+
+
+```
+
 
 ```{r}
 # function implementation example
