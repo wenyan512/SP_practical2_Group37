@@ -98,7 +98,8 @@ Pall <- function(n,strategy,nreps){
     
     for (i in 1:nreps) {
       card <- sample(1:(2*n), size = 2*n, replace = FALSE)
-      count = replicate(2*n, 0)
+      # create a variable storing 1 at count[i] if ith prisoner successes
+      count <- replicate(2*n, 0)
       
       for (k in prisoners) {
         
@@ -118,6 +119,8 @@ Pall <- function(n,strategy,nreps){
           times = times + 1 
         }
       } 
+      # if sum(count) == 2*n, it means all of prisoners success
+      # and this is considered as a real success for all prisoners go free and add all_count by 1
       if (sum(count) == (2*n)) {
         all_count = all_count + 1
       }
@@ -159,7 +162,6 @@ Pall <- function(n,strategy,nreps){
     }
     
     all_prob = all_count/nreps
-    print(all_count)
     return(all_prob)
   }
   
@@ -182,7 +184,6 @@ Pall <- function(n,strategy,nreps){
       }
     }
     all_prob = all_count/nreps
-    print(all_count)
     return(all_prob)
   }
 }
@@ -217,4 +218,106 @@ Pall(50,2,10000)
 Pall(5,3,10000)
 Pall(50,3,10000)
 ```
+
+## Question 5
+```{r}
+dloop <- function(n, nreps) {
+  prisoners <- sample(1:(2*n), size = 2*n, replace = FALSE)
+  count_set = matrix(0, nrow = (2*n), ncol = (2*n))
+  
+  for (i in 1:nreps) {
+    # sample card before looping through prisoners to make sure each prisoner goes to the same     # room
+    card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+    
+    # loop through each prisoner
+    for (k in 1:(2*n)){
+      card_index = vector(length = (2*n))
+      card_index[1] = prisoners[k]
+      # since we have done the first check, here set open times equal to 1
+      open_times <- 1
+      # check for each prisoner if the first opening time successes
+      if (card[card_index[1]] == prisoners[k]) {
+          count_set[k,1] = count_set[k,1] + 1
+      }
+      
+      # if the first check fails, start looping
+      else{
+        while (card[card_index[open_times]] != prisoners[k]){
+          # store the number of box that we should open after the previous check fails, until
+          # we find the card labeled with the number of a particular prisoner
+          card_index[open_times+1] = card[card_index[open_times]]
+        
+        open_times <- open_times + 1
+        }
+        # we store 1 in the corresponding pair (kth prisoner, number of check until success)
+        # if the open_time th check successes
+        count_set[k,open_times] = count_set[k,open_times] + 1
+      }
+    }
+  }
+  
+  # create a variable storing the sum of each column
+  column_sum <- colSums(count_set)
+  # calculate the probability of each time of check (1-2n)
+  probability <- column_sum/((2*n)*nreps)
+  return(probability)
+}
+```
+
+## Question 5 (2)
+```{r}
+dloop <- function(n, nreps) {
+  prisoners <- sample(1:(2*n), size = 2*n, replace = FALSE)
+  all_count <- replicate(2*n, 0)
+  
+  for (i in 1:nreps) {
+    # sample card before looping through prisoners to make sure each prisoner goes to the same     
+    # room
+    card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+    # we store 1 in the corresponding pair (kth prisoner, number of check until success)
+    count_set = matrix(0, nrow = (2*n), ncol = (2*n))
+    
+    # loop through each prisoner
+    for (k in 1:(2*n)){
+      card_index = vector(length = (2*n))
+      card_index[1] = prisoners[k]
+      times <- 0
+      # check for each prisoner if the first opening time successes
+      while (times < (2*n)){
+        if (card[card_index[times+1]] == prisoners[k]) {
+          count_set[k,times+1] = count_set[k,times+1] + 1
+          break
+        }
+        
+        else {
+          card_index[times+2] = card[card_index[times+1]]
+        }
+        times <- times + 1
+      }
+    }
+    col_index <- which(colSums(count_set) > 0)
+    all_count[col_index] = all_count[col_index] + 1
+  }
+  probability <- all_count/nreps
+  return(probability)
+}
+```
+
+## Question 6
+```{r}
+Prob <- function(nreps){
+  count <- 0
+  for (i in 1:nreps) {
+    result = dloop(50,1)
+    if (sum(result[51:100] == 0) == 50){
+      count = count + 1
+    }
+}
+  return(count/nreps)
+}
+
+Prob(10000)
+system.time(dloop(50,10000))
+```
+
 
