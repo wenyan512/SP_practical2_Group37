@@ -249,6 +249,72 @@ n50_joint_success_prob_3 <- Pall(n2, 3, nrep); n50_joint_success_prob_3
 ```
 
 ```{r}
+dloop <- function(n, nrep){
+  # a list of prisoner number
+  prisoners_num <- c(1:(2*n))
+  
+  # create a list to record the occurrence of the each times
+  # e.g. count_l[1] = 10 means there are totally 10 times the prisoner just need to open the first box and succeed.
+  count_l <- rep(0,(2*n))
+  
+  for (i in 1:nrep){
+    # every repeat time change the card number
+    cards_num <- sample(1:(2*n),2*n,replace=FALSE)
+    
+    # create a list to record the open times for 2n prisoners
+    open_times_l <- rep(0,(2*n))
+    for (prisoner in prisoners_num){
+      # the card number of the box that s/he first open
+      card_number <- cards_num[prisoner]
+      # record the loops/times that a person need to find her/his number
+      # s/he has already open one box
+      open_times <- 1
+      # if the card number in the box that s/he first opend is not her/his prisoner number, s/he still need to open until s/he finds her/his prisoner number
+      while(card_number != prisoner){
+        # new and current box number that s/he will open next
+        box_num <- card_number
+        # new and current card number that s/he open now
+        card_number = cards_num[box_num]
+        # add one means s/he open the boxes one more times
+        open_times <- open_times+1
+      }
+      # when a prisoner open (open_times) boxes to find out their prisoner number, add 1 to the count list, which means there is one more times that at least a loop of length (open_times) to find out the number
+      open_times_l[prisoner] <- open_times
+      # count_l[open_times] <- 1#count_l[open_times]+1
+    }
+    # print(open_times_l)
+    # print(unique(open_times_l))
+    count_l[unique(open_times_l)] <- count_l[unique(open_times_l)]+1
+  }
+  # return(count_l/((2*n)*nrep))
+  # print(count_l)
+  return(count_l/nrep)
+}
 
+# n <- 5
+# nrep <- 10000
+dloop(5, 3)
+system.time(dloop(50, 10000))
+
+```
+
+```{r}
+# estimate the probabilities for n = 50
+prob_l <- dloop(50, 10000)
+prob_l
+# sum(prob_l[51:100])
+```
+```{r}
+suibian <- function(){
+  nrep <- 10000
+  # record the number of no loop longer than 50 in a random reshuffling of cards to boxes
+  count <- 0
+  for (i in 1:nrep){
+    loop <- dloop(50, 1)
+    if (sum(loop[51:100] == 0) == 50) count <- count+1
+  }
+  return(count/nrep)
+}
+system.time(suibian())
 ```
 
