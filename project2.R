@@ -139,4 +139,50 @@ pall<-function(n,strategy,nreps=10000){
 }
 
 ##3.4 done       
-        
+# From the results obtained from function "Pone", the estimated probabilities of a single prisoner succeeding in finding their number  
+# for three strategies are converging to 0.5, 0.4, 0.5 respectively. However, the results from 
+# function "Pall", which shows that the estimated probability of all prisoners finding their number is totally 
+# different for three strategies. 
+# Surprisingly, the estimated probability for all prisoner are released is over 30% for strategy 1, 
+# and the success rate of other two strategies are low, especially it will result in nearly 0 for strategy 3. 
+# The most important reason why the prisoners have such high probability to escape in strategy 1
+# is the prisoners don't have to decide where he/she chooses at the first step.
+# In other words, the success of one prisoner is not independent of the success of the other prisoners in strategy 1,
+# since it will depend on how the cards are distributed.
+
+
+
+####5
+dloop<-function(n,nreps){
+  number_of_prisoners=2*n
+  count_initial<-matrix(0,nreps,2*n)
+  for(i in 1:nreps){## 第几次循环
+    card_distribution = sample(1:number_of_prisoners,number_of_prisoners,replace=F)
+    for (j in 1:(2*n)){  ##1：2n个人第几次成功 
+      set=rep(0,2*n)
+      set[1]=card_distribution[j]
+      for(k in 2:(2*n)){
+        set[k]=card_distribution[set[k-1]]
+      }
+      index<- match(j,set)##第一次出现j,也就是卡片第一次出现人对应编号
+      count_initial[i,index]=1
+    }
+  }
+  pro_sum<-rep(0,2*n)
+  column_sum<-rep(0,2*n)
+  for(o in 1:(2*n)){
+    column_sum[o]<-sum(count_initial[,o])
+    pro_sum[o]<-column_sum[o]/nreps
+  }
+  return(pro_sum)
+}
+##6
+nreps=10000
+count = 0
+for (i in 1:nreps){
+  single_loop=dloop(50,1)
+  if(sum(single_loop[51:100]==0)==50){
+    count=count+1
+  }
+}
+print(count/nreps)
