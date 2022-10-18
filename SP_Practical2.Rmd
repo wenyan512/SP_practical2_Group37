@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Question 1
 ```{r}
 Pone <- function(n,k,strategy,nreps){
+  
   # strategy 1
   if (strategy == 1){
     count = 0
@@ -47,8 +48,8 @@ Pone <- function(n,k,strategy,nreps){
     count = 0
     
     for (i in 1:nreps) {
-      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
       
+      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
       card_index = vector(length = n)
       # starting from a randomly selected box
       card_index[1] = sample(1:(2*n), size = 1)
@@ -90,13 +91,130 @@ Pone <- function(n,k,strategy,nreps){
 ## Question 2
 ```{r}
 Pall <- function(n,strategy,nreps){
-  prisoner <- sample(1:(2*n), size = 2*n, replace = FALSE)
-  individual <- vector(length = 2*n)
+  prisoners <- sample(1:(2*n), size = 2*n, replace = FALSE)
   
-  for (i in prisoner) {
-    individual[i] <- Pone(n,i,strategy,nreps)}
+  if (strategy == 1){
+    all_count = 0
+    
+    for (i in 1:nreps) {
+      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+      count = replicate(2*n, 0)
+      
+      for (k in prisoners) {
+        
+        card_index = vector(length = n)
+        card_index[1] = prisoners[k]
+        times = 0
+        while (times < n) {
+          
+          if (card[card_index[times+1]] == prisoners[k]) {
+            count[k] = 1 
+            break
+          }
+          
+          else{ 
+            card_index[times+2] = card[card_index[times+1]]
+          }
+          times = times + 1 
+        }
+      } 
+      if (sum(count) == (2*n)) {
+        all_count = all_count + 1
+      }
+    }
+    
+    all_prob = all_count/nreps
+    return(all_prob)
+  }
   
-  all_prob = 
+  if (strategy == 2){
+    all_count = 0
+    
+    for (i in 1:nreps) {
+      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+      count = replicate(2*n, 0)
+      
+      for (k in prisoners) {
+        
+        card_index = vector(length = n)
+        # starting from a randomly selected box
+        card_index[1] = sample(1:(2*n), size = 1)
+        times = 0
+        while (times < n) {
+          
+          if (card[card_index[times+1]] == prisoners[k]) {
+            count[k] = 1 
+            break
+          }
+          
+          else{ 
+            card_index[times+2] = card[card_index[times+1]]
+          }
+          times = times + 1 
+        }
+      } 
+      if (sum(count) == (2*n)) {
+        all_count = all_count + 1
+      }
+    }
+    
+    all_prob = all_count/nreps
+    print(all_count)
+    return(all_prob)
+  }
+  
+  if (strategy == 3) {
+    all_count = 0
+    
+    for (i in 1:nreps) {
+      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+      count = replicate(2*n, 0)
+      
+      for (k in prisoners) {
+        card_index <- sample(1:(2*n), size = n, replace = FALSE)
+        
+        if (prisoners[k] %in% card[card_index]) {
+          count[k] = 1 
+        }
+      }
+      if (sum(count) == (2*n)) {
+        all_count = all_count + 1
+      }
+    }
+    all_prob = all_count/nreps
+    print(all_count)
+    return(all_prob)
+  }
 }
+
+```
+
+## Question 3
+```{r}
+# individual probabilities
+## strategy 1
+Pone(5,1,10000)
+Pone(50,1,10000)
+
+## strategy 2
+Pone(5,2,10000)
+Pone(50,2,10000)
+
+## strategy 3
+Pone(5,3,10000)
+Pone(50,3,10000)
+
+# joint success probabilities
+## strategy 1
+Pall(5,1,10000)
+Pall(50,1,10000)
+
+## strategy 2
+Pall(5,2,10000)
+Pall(50,2,10000)
+
+## strategy 3
+Pall(5,3,10000)
+Pall(50,3,10000)
 ```
 
