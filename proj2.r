@@ -23,14 +23,16 @@
 # The set up of this puzzle is basically as follows: 
 # 2n prisoners each with unique numbers from 1 to 2n
 # 2n boxes each with unique numbers from 1 to 2n painted on its lid
-# 2n cards each printed with a unique number from 1 to 2n, are randomly placed one in each box
-# Prisoners have the task of finding the card with their number on it by opening a maximum on n boxes.
+# 2n cards each printed with a unique number from 1 to 2n, are randomly placed 
+# one in each box.
+# Prisoners have the task of finding the card with their number on it by opening 
+# a maximum on n boxes.
 
 # The three strategies are:
-# 1) The prisoner starts at the box with their number on it, opens it and reads the number on 
-# the card: k, say. If k is not their prisoner number, they go to box number k, open it and repeat 
-# the process until they have either found the card with their number on it, or opened n boxes without 
-# finding it.
+# 1) The prisoner starts at the box with their number on it, opens it and reads 
+#    the number on the card: k, say. If k is not their prisoner number, they go 
+#    to box number k, open it and repeat the process until they have either 
+#    found the card with their number on it, or opened n boxes without finding it.
 # 2) As strategy 1, but starting from a randomly selected box.
 # 3) Prisoners open n boxes at random, checking each card for their number.
 
@@ -38,11 +40,12 @@
 # We first estimated the probabilities of success (going free) for a single prisoner. 
 # Then, we estimated the probabilities for all prisoners to succeed so that they are freed.
 
-# Finally, we estimated a probability distribution of the number of times (from 1 to 2n) needed for 
-# a prisoner to succeed (find her/his card). Based on this, we can better understand the surprising result.
+# Finally, we estimated a probability distribution of the number of times 
+# (from 1 to 2n) needed for a prisoner to succeed (find her/his card). 
+# Based on this, we can better understand the surprising result.
 
 
-############################# Write a function to avoid repetition in code #############################
+################# Write a function to avoid repetition in code #################
 
 # Function purpose: 
 # function 'Success' is going to check whether a person can succeed in 
@@ -50,8 +53,8 @@
 
 # Input: 
 # n -> half of the number of prisoner (2*n is the total number of prisoners)
-# card_dist -> the card distribution obtained from randomly simulation, indicating how the 
-#              card numbers placed in each replication (nrep) 
+# card_dist -> the card distribution obtained from randomly simulation, indicating 
+#              how the card numbers placed in each replication (nrep) 
 # prisoner_num -> prisoner number, indicates which prisoner to be estimated
 # strategy -> 1/2/3 (call one of the three strategies to investigate)
 
@@ -78,7 +81,8 @@ Success <- function(n, card_dist, prisoner_num, strategy){
     
     # each prisoner has n chances of opening a box
     for (open_times in 1:n){
-      # if the card in the box s/he open is her/his prisoner number, s/he successes and return TRUE
+      # if the card in the box s/he open is her/his prisoner number, 
+      # s/he successes and return TRUE
       if (k == prisoner_num) return (TRUE)
       # if k is not their prisoner number
       else {
@@ -101,11 +105,12 @@ Success <- function(n, card_dist, prisoner_num, strategy){
     # so s/he succeeds in finding her/his prisoner number, and return TRUE
     if (prisoner_num %in% select_card_num) return (TRUE)
   }
-  # if the prisoner cannot find the number after opening n boxes, s/he fails and 'Success' returns FALSE
+  # if the prisoner cannot find the number after opening n boxes, s/he fails 
+  # and 'Success' returns FALSE
   return (FALSE) 
 }
 
-############################# Write a function to avoid repetition in code #############################
+################# Write a function to avoid repetition in code #################
 
 
 # Function purpose: 
@@ -130,12 +135,14 @@ Pone <- function(n, k, strategy, nreps){
     # since after each prisoner’s go, the room is returned exactly to its original state 
     # indicates that the card distribution is the same for each replication
     card_dist <- sample(1:(2*n), size = 2*n, replace = FALSE)
-    # Using 'Success' function to check whether the prisoner can find her/his prisoner or not
-    # if 'Success' return TRUE, which means s/he succeeded in find her/his number in this run
-    # then add 1 to count_success, since s/he succeeded in this replication out of nreps replications
+    # Using 'Success' function to check whether the prisoner can find her/his 
+    # prisoner or not if 'Success' return TRUE, which means s/he succeeded in 
+    # find her/his number in this run then add 1 to count_success, since s/he 
+    # succeeded in this replication out of nreps replications
     if (Success(n,card_dist,k,strategy)) count_success <- count_success + 1
   }
-  # estimate the probability of a single prisoner (k) succeeding in finding his/her prisoner number
+  # estimate the probability of a single prisoner (k) succeeding in finding 
+  # his/her prisoner number
   prob = count_success/nreps
   return (prob)
 }
@@ -152,13 +159,14 @@ Pone <- function(n, k, strategy, nreps){
 #         (10000 is a reasonable default)
 
 # Output: 
-# the estimated probability of all prisoners finding their number, so that all are released, 
-# according to nreps repeating times under the strategy=1/2/3.
+# the estimated probability of all prisoners finding their number, so that all 
+# are released, according to nreps repeating times under the strategy=1/2/3.
 
 Pall <- function(n, strategy, nreps){
   # initialize the prisoner number and record all prisoners numbers
   prisoners_num <- c(1:(2*n))
-  # count the number of the success that a person can find his/her number out of nreps replications
+  # count the number of the success that a person can find his/her number out 
+  # of nreps replications
   count_success = 0
   for (i in 1:nreps){
     # every repeat time change the distribution of the card number
@@ -168,13 +176,15 @@ Pall <- function(n, strategy, nreps){
     success_prisoner <- 0
     # For each prisoner, we check whether s/he can find her/his prisoner number or not
     for (prisoner in prisoners_num){
-      # Using 'Success' function to check whether the prisoner can find her/his prisoner or not
-      # if 'Success' return TRUE, which means s/he succeeded in find her/his number in this run
-      # then add 1 to success_prisoner, since s/he succeeded in this replication out of nreps replications
+      # Using 'Success' function to check whether the prisoner can find her/his 
+      # prisoner or not if 'Success' return TRUE, which means s/he succeeded in 
+      # find her/his number in this run then add 1 to success_prisoner, since s/he 
+      # succeeded in this replication out of nreps replications
       if (Success(n,card_dist,prisoner,strategy)) success_prisoner <- success_prisoner + 1
     }
-    # if the number of success is equal to the number of prisoner (2n), it means all prisoners 
-    # found their numbers in this run (succeed in this replication), we added 1 to count_success
+    # if the number of success is equal to the number of prisoner (2n), it means 
+    # all prisoners found their numbers in this run (succeed in this replication), 
+    # we added 1 to count_success
     if (success_prisoner == (2*n)) count_success <- count_success + 1
   }
   prob <- count_success/nreps
@@ -233,26 +243,27 @@ n50_joint_success_prob_3 <- Pall(n2, 3, nreps); n50_joint_success_prob_3
 ############################# surprising results ###############################
 
 # From the results obtained from function "Pone", the estimated probabilities of 
-# a single prisoner succeeding in finding their number under three strategies converges 
-# to 0.5, 0.4, 0.5 respectively. However, the results from function "Pall" shows that 
-# the estimated probabilities of all prisoners finding their numbers are relatively different 
-# under these three strategies. Surprisingly, the estimated probability for all prisoner being 
-# released is over 30% under strategy 1, which is unexpectedly high compared with the results 
+# a single prisoner succeeding in finding their number under three strategies 
+# converges to 0.5, 0.4, 0.5 respectively. However, the results from function 
+# "Pall" shows that the estimated probabilities of all prisoners finding their 
+# numbers are relatively different under these three strategies. Surprisingly, 
+# the estimated probability for all prisoner being released is over 30% under 
+# strategy 1, which is unexpectedly high compared with the results 
 # under another two strategies. Under strategy 3, the result is nearly 0.
 
 # The most possible reason why the prisoners have such high probability to escape under 
 # strategy 1 is the prisoners don't have to decide which box he/she opens first, 
-# that is, there are more constraints under strategy 1. Another important point is that 
-# the success of one prisoner is not independent of the success of the other prisoners in 
-# this way, since they all depend on the way the numbers are distributed.
+# that is, there are more constraints under strategy 1. Another important point 
+# is that the success of one prisoner is not independent of the success of the 
+# other prisoners in this way, since they all depend on the way the numbers are distributed.
 
 ############################# surprising results ###############################
 
 
 # Function purpose: 
-# function 'dloop' is going to estimate the probability distribution of the number of times 
-# which is also the loop length (from 1 to 2n), needed for a prisoner to succeed 
-# (find her/his card) out of nreps replications.
+# function 'dloop' is going to estimate the probability distribution of the number 
+# of times which is also the loop length (from 1 to 2n), needed for a prisoner 
+# to succeed (find her/his card) out of nreps replications.
 
 # Input: 
 # n = half of the number of people (2*n is the total number of prisoners)
@@ -275,7 +286,8 @@ dloop <- function(n, nreps){
     # randomly placed one in each box.
     cards_dist <- sample(1:(2*n),2*n,replace=FALSE)
     
-    # create a list to record the open times until finding their prisoner numbers for 2n prisoners
+    # create a list to record the open times until finding their prisoner numbers 
+    # for 2n prisoners
     open_times_l <- rep(0,(2*n))
     for (prisoner in prisoners_num){
       # store the card numbers in the boxes that all prisoners opened for the first time
@@ -283,11 +295,11 @@ dloop <- function(n, nreps){
       # record the loops/times that a person need to find her/his number
       # suppose s/he has already open one box
       open_times <- 1
-      # if the card number in the box that s/he first opened was not her/his prisoner number, 
-      # s/he still need to open until s/he finds her/his prisoner number
+      # if the card number in the box that s/he first opened was not her/his prisoner
+      # number, s/he still need to open until s/he finds her/his prisoner number
       while(card_number != prisoner){
-        # new and current box numbers that s/he will open next based on the card numbers in the 
-        # boxes that prisoners opened before
+        # new and current box numbers that s/he will open next based on the card 
+        # numbers in the boxes that prisoners opened before
         box_num <- card_number
         # new and current card numbers that s/he open now based on the new box numbers
         card_number = cards_dist[box_num]
@@ -297,17 +309,18 @@ dloop <- function(n, nreps){
       # store the corresponding open times for 2n prisoners for each of the replication
       open_times_l[prisoner] <- open_times
     }
-    # using unique() since we are asked to estimate the probability of each loop length 
-    # from 1 to 2n occurring *at least once* in each replication. That is, say when there 
-    # are more than one prisoner going free the first time s/he opened the box, we only 
-    # count 1 for this replication, instead of summing all the number of prisoners who success
-    # at the first time 
+    # using unique() since we are asked to estimate the probability of each loop 
+    # length from 1 to 2n occurring *at least once* in each replication. That is, 
+    # say when there are more than one prisoner going free the first time s/he 
+    # opened the box, we only count 1 for this replication, instead of summing 
+    # all the number of prisoners who success at the first time 
     
-    # count the number of replication in which each loop length occurs at least once out of n 
-    # replications by each time adding 1
+    # count the number of replication in which each loop length occurs at least 
+    # once out of n replications by each time adding 1
     count_l[unique(open_times_l)] <- count_l[unique(open_times_l)] + 1
   }
-  # the probability distribution required can be obtained by just divide *count_l* by *nreps*
+  # the probability distribution required can be obtained by just divide 
+  # *count_l* by *nreps*
   prob_dist <- count_l/nreps
   return(prob_dist)
 }
@@ -336,15 +349,17 @@ print(prob)
 
 ## Visualize the probability distribution of each loop length (1 to 2n), which 
 ## is also the number of opening times needed for a prisoner to succeed 
-barplot(dloop(50,10000),main="Visualization of probability distribution of each loop length",
+barplot(dloop(50,10000),
+        main="Visualization of probability distribution of each loop length",
         xlab='Loop length (1 to 2n)',ylab='Frequency in 10000 times',
-        names.arg=c(1:100),col="blue")
+        names.arg=c(1:100),
+        col="blue")
 
 ############################# surprising results ###############################
 
 # We surprisingly found that the probability that there is no loop longer than 50
 # is very similar to the result derived from Pall(50, 10000), that is the 
-# probability of all prisoners (100) finding their number. Both of them indicates that
-# for 2n prisoners, all of them can be released before n opening times.
+# probability of all prisoners (100) finding their number. Both of them 
+# indicates that for 2n prisoners, all of them can be released before n opening times.
 
 ############################# surprising results ###############################
