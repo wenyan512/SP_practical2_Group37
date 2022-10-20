@@ -15,6 +15,8 @@
 # Finally, simulating the strategy 1 in the version of loop length. 
 
 
+# verify the total time of running the 
+start.time <- format(Sys.time(), format="%H:%M:%S")
 
 # Function purpose: function 'Success' is going to check whether a person can succeed in finding their prisoner number after n open times or not
 # Input: n = half of the number of people (2*n is the total number of prisoners)
@@ -188,5 +190,10 @@ n50_joint_success_prob_3 <- Pall(n2, 3, nreps); n50_joint_success_prob_3
 
 
 
-
+end.time <- format(Sys.time(), format="%H:%M:%S")
+time.diff <- as.difftime(c(start.time,end.time),units='secs')
+time.diff <- as.numeric(time.diff,units='secs')
+(time.diff[2]-time.diff[1])/60
+end.time
+start.time
 
