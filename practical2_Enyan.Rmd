@@ -8,7 +8,6 @@ date: '2022-10-15'
 Pone <- function(n, k, strategy, nrep){
   prisoners_num <- c(1:(2*n))
   boxes_num <- c(1:(2*n))
-  # boxes_num <- sample(1:(2*n), 2*n, replace=FALSE)
 
   curr_prisoner_num <- k # initial k: current prisoner number 
   # count the number of the success that a person can find his/her number 
@@ -16,7 +15,6 @@ Pone <- function(n, k, strategy, nrep){
   for (i in 1:nrep){
     # every repeat time change the distribution of the card number
     cards_num <- sample(1:(2*n), 2*n, replace=FALSE)
-    # print(cards_num)
     
     ## for strategy 1 and strategy2
     if (strategy == 1 || strategy == 2){
@@ -34,39 +32,24 @@ Pone <- function(n, k, strategy, nrep){
         k <- cards_num[random_box]
       }
       
-      # print('box number:')
-      # print(curr_prisoner_num)
-      # print('card number:')
-      # print(k)
-      # print('--------------')
-      
       # each prisoner has n chances of opening a box
-      n_box_open <- 1 # has already open the box once and record the card number as k
+      # n_box_open <- 1 # has already open the box once and record the card number as k
       
       # when the number of boxes he/she open less than n
-      while (n_box_open<n){
+      # while (n_box_open<=n){
+      for (open_times in 1:n)
         # if the card in the box they open is their prisoner number, they success
         if (k == curr_prisoner_num) {
           success_n <- success_n+1
-          # print('---------------success------------------')
           break;
         }
         # if k is not their prisoner number
         if (k != curr_prisoner_num) {
-        
-          # print('box number:')
-          # print(k)
-          # print('card number:')
-          # print(cards_num[k])
-          # print('--------------')  
-          
           # go to box number k, read the card num as new k
           k <- cards_num[k]
-          # count the number of the boxes they have already opened
-          n_box_open <- n_box_open+1
-        
+          # # count the number of the boxes they have already opened
+          # n_box_open <- n_box_open+1
         }
-        # if (n_box_open==n) print('---------------fail------------------')
       }
     }
     
@@ -80,7 +63,6 @@ Pone <- function(n, k, strategy, nrep){
       # which means one of he/she selected box contian a card with their prison number
       if (curr_prisoner_num %in% select_card_num){
         success_n <- success_n+1
-        # print('---------------success------------------')
       }
     }
   }
@@ -95,9 +77,10 @@ Pone <- function(n, k, strategy, nrep){
 # strategy <- 2   # strategy=1/2/3 corresponding to strategy 1, 2, and 3
 # nrep <- 10000    # the number of replicate simulations to run in order to estimate the probability(10000 is a reasonable default)
 # # a test for Pone function
-prob <- Pone(5, 7, 1, 1000)
+set.seed(100)
+prob <- Pone(50, 7, 1, 10000)
 prob
-# system.time(Pone(1000, 7, 3, 1000))
+system.time(Pone(50, 7, 3, 1000))
 ```
 
 ```{r}
@@ -299,6 +282,41 @@ system.time(dloop(50, 10000))
 ```
 
 ```{r}
+dloop <- function(n, nreps) {
+  prisoners <- c(1:(2*n))#sample(1:(2*n), size = 2*n, replace = FALSE)
+  count_set = matrix(0, nrow = nreps, ncol = (2*n))
+  # zero <- replicate(2*n, 0)
+  
+  for (i in 1:nreps) {
+    card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+    # count <- 0
+    for (k in prisoners) {
+      card_index = vector(length = (2*n))
+      card_index[1] = k
+      times <- 1
+      # check for each prisoner if the first opening time successes
+      while (card[card_index[times]] != k){
+        card_index[times+1] = card[card_index[times]]
+        times <- times + 1
+      }
+      count_set[i,times] = 1
+    }
+  }
+  # print(colSums(count_set))
+  # print(colSums(count_set)/nreps)
+  # for (j in count_set) {
+  #   zero[j] <- sum(count_set[,j] == 0)
+  # }
+  # prob <- (nreps - zero)/nreps
+  # return (prob)
+  return(colSums(count_set)/nreps)
+}
+dloop(50, 10000)
+system.time(dloop(50, 10000))
+```
+
+
+```{r}
 # estimate the probabilities for n = 50
 prob_l <- dloop(50, 10000)
 prob_l
@@ -316,5 +334,339 @@ suibian <- function(){
   return(count/nrep)
 }
 system.time(suibian())
+```
+
+```{r}
+for (i in 1:nreps){
+  # every repeat time change the distribution of the card number
+  card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+  
+  # count the number of the success that a person can find his/her number 
+  count_success = 0
+  
+  # create a list containing the index of *card*
+  card_index <- vector(length = n)
+  
+  if (strategy == 1){
+    # the first element of *card_index* should be the prisoner’s number
+    card_index[1] <- k
+      
+      # record the number of times of opening a box
+      times <- 1 ## has already open the box once and record the card number as k
+      # when the number of boxes he/she open less than n
+      while (times < n) {
+        # check whether the number in *card* equals the prisoner’s number, 
+        # if equal, s/he succeeding in finding their number and then break the while loop
+        if (card[card_index[times]] == k) {
+          count <- count + 1 
+          break
+        }
+        # if the card number is not his/her prisoner number
+        else{
+          # go to the box which is printed the number as card number he open last times (times)
+          # then record the new box number he will open in (times+1) times
+          card_index[times+1] = card[card_index[times]]
+          # add 1 to the boxes opening times, since s/he has opened one more box
+          times = times + 1
+        }
+      }
+    }
+    # estimate the probability of a single prisoner (k) succeeding in finding his/her prisoner number
+    prob = count/nreps
+    return (prob) 
+  }
+```
+
+```{r}
+Pone <- function(n, k, strategy, nreps){
+  
+  # strategy 1
+  if (strategy == 1){
+    # count the number of the success that a person can find his/her number 
+    count_success = 0
+    
+    for (i in 1:nreps) {
+      # every repeat time change the distribution of the card number
+      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+      
+      # create a list containing the index of *card*
+      card_index <- vector(length = n)
+      # the first element of *card_index* should be the prisoner’s number
+      card_index[1] <- k
+      
+      # record the number of times of opening a box
+      times <- 1 ## has already open the box once and record the card number as k
+      # when the number of boxes he/she open less than n
+      while (times < n) {
+        # check whether the number in *card* equals the prisoner’s number, 
+        # if equal, s/he succeeding in finding their number and then break the while loop
+        if (card[card_index[times]] == k) {
+          count_success <- count_success + 1 
+          break
+        }
+        # if the card number is not his/her prisoner number
+        else{
+          # go to the box which is printed the number as card number he open last times (times)
+          # then record the new box number he will open in (times+1) times
+          card_index[times+1] = card[card_index[times]]
+          # add 1 to the boxes opening times, since s/he has opened one more box
+          times = times + 1
+        }
+      }
+    }
+    # estimate the probability of a single prisoner (k) succeeding in finding his/her prisoner number
+    prob = count_success/nreps
+    return (prob) 
+  }
+  
+  # strategy 2
+  if (strategy == 2){
+    count = 0
+    
+    for (i in 1:nreps) {
+      
+      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+      card_index = vector(length = n)
+      # starting from a randomly selected box
+      card_index[1] = sample(1:(2*n), size = 1)
+      
+      times = 0
+      while (times < n) {
+        
+        if (card[card_index[times+1]] == k) {
+          count = count +1 
+          break}
+        
+        else{ 
+          card_index[times+2] = card[card_index[times+1]]}
+        
+        times = times + 1
+        
+      }}
+    
+    prob = count/nreps
+    return (prob) }
+  
+  # strategy 3
+  if (strategy == 3){
+    count = 0
+    
+    for (i in 1:nreps) {
+      card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+      card_index <- sample(1:(2*n), size = n, replace = FALSE)
+      
+      if (k %in% card[card_index]){
+        count = count + 1 }
+    }
+    
+    prob = count/nreps
+    return (prob)
+  } }
+```
+
+```{r}
+# check a person cannot succeed find their prisoner number after n open times
+Success <- function(card_dist, prisoner_num, strategy){
+  # strategy 1
+  if (strategy == 1){
+    # create a list containing the index of *card*
+    card_index <- vector(length = n)
+    # In strategy 1, the first element of *card_index* should be the prisoner’s number
+    card_index[1] <- prisoner_num
+    # record the number of times of opening a box
+    # initialize the number of times of opening a box
+    times <- 0
+    
+    # when the number of boxes he/she open less than n
+    while (times < n) {
+      # check whether the number in *card* equals the prisoner’s number, 
+      # if equal, s/he succeeding in finding their number and then break the while loop
+      if (card_dist[card_index[times+1]] == prisoner_num)  return(TRUE)
+      # if the card number is not his/her prisoner number
+      else{
+        # go to the box which is printed the number as card number he open last times (times)
+        # then record the new box number he will open in (times+2) times
+        card_index[times+2] = card_dist[card_index[times+1]]
+      }
+      # add 1 to the boxes opening times, since s/he has opened one more box
+      times = times + 1
+    }
+  }
+  # strategy 2
+  if (strategy == 2){
+    # create a list containing the index of *card*
+    card_index <- vector(length = n)
+    # In strategy 2, starting from a randomly selected box
+    card_index[1] = sample(1:(2*n), size = 1)
+    # record the number of times of opening a box
+    # initialize the number of times of opening a box
+    times <- 0
+    
+    # when the number of boxes he/she open less than n
+    while (times < n) {
+      # check whether the number in *card* equals the prisoner’s number, 
+      # if equal, s/he succeeding in finding their number and then break the while loop
+      if (card_dist[card_index[times+1]] == prisoner_num)  return(TRUE)
+      else{
+        # go to the box which is printed the number as card number he open last times (times)
+        # then record the new box number he will open in (times+2) times
+        card_index[times+2] = card_dist[card_index[times+1]]
+      }
+      # add 1 to the boxes opening times, since s/he has opened one more box
+      times = times + 1
+    }
+  }
+  
+  #
+   # strategy 3
+  if (strategy == 3){
+    # In strategy 3, the card numbers in the boxes s/he will open is randomly choose n from 1:2n
+    card_index <- sample(1:(2*n), size = n, replace = FALSE)
+    
+    # if the prison number in the card numbers of the boxes (card_index) s/he will open
+    # which means one of he/she selected box contain a card with their prison number
+    # 
+    # add 1 to the count_success, since s/he has succeed in finding her/his number one more times
+    if (prisoner_num %in% card_dist[card_index]) return(TRUE)
+  }
+  else return(FALSE) 
+}
+```
+
+```{r}
+n <- 5
+card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+if(Success(card,2,1)) print('True')
+```
+
+```{r}
+Pone <- function(n, k, strategy, nreps){
+  # count the number of the success that a person can find his/her number 
+  count_success = 0
+  for (i in 1:nreps) {
+    # every repeat time change the distribution of the card number
+    card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+    
+    if (Success(card,k,strategy)) count_success <- count_success+1
+    
+    # strategy 1
+    if (strategy == 1){
+      # create a list containing the index of *card*
+      card_index <- vector(length = n)
+      # In strategy 1, the first element of *card_index* should be the prisoner’s number
+      card_index[1] <- k
+      # record the number of times of opening a box
+      # initialize the number of times of opening a box
+      times <- 0
+      
+      # when the number of boxes he/she open less than n
+      while (times < n) {
+        # check whether the number in *card* equals the prisoner’s number, 
+        # if equal, s/he succeeding in finding their number and then break the while loop
+        if (card[card_index[times+1]] == k) {
+          count_success <- count_success + 1 
+          break
+        }
+        # if the card number is not his/her prisoner number
+        else{
+          # go to the box which is printed the number as card number he open last times (times)
+          # then record the new box number he will open in (times+2) times
+          card_index[times+2] = card[card_index[times+1]]
+        }
+        # add 1 to the boxes opening times, since s/he has opened one more box
+        times = times + 1
+      }
+    }
+    # strategy 2
+    if (strategy == 2){
+      # create a list containing the index of *card*
+      card_index <- vector(length = n)
+      # In strategy 2, starting from a randomly selected box
+      card_index[1] = sample(1:(2*n), size = 1)
+      # record the number of times of opening a box
+      # initialize the number of times of opening a box
+      times <- 0
+      
+      # when the number of boxes he/she open less than n
+      while (times < n) {
+        # check whether the number in *card* equals the prisoner’s number, 
+        # if equal, s/he succeeding in finding their number and then break the while loop
+        if (card[card_index[times+1]] == k) {
+          # add 1 to the count_success, since s/he has succeed in finding her/his number one more times
+          count_success = count_success +1 
+          break
+        }
+        else{
+          # go to the box which is printed the number as card number he open last times (times)
+          # then record the new box number he will open in (times+2) times
+          card_index[times+2] = card[card_index[times+1]]
+        }
+        # add 1 to the boxes opening times, since s/he has opened one more box
+        times = times + 1
+      }
+    }
+    
+    # strategy 3
+    if (strategy == 3){
+      # In strategy 3, the card numbers in the boxes s/he will open is randomly choose n from 1:2n
+      card_index <- sample(1:(2*n), size = n, replace = FALSE)
+      
+      # if the prison number in the card numbers of the boxes (card_index) s/he will open
+      # which means one of he/she selected box contain a card with their prison number
+      # 
+      # add 1 to the count_success, since s/he has succeed in finding her/his number one more times
+      if (k %in% card[card_index]) count_success = count_success + 1
+    }
+  }
+  # estimate the probability of a single prisoner (k) succeeding in finding his/her prisoner number
+  prob = count_success/nreps
+  return (prob)
+}
+
+
+# Function purpose: function 'Pall' is going to estimate the probability of all prisoners finding their number, so that all are released.
+# Input: n = half of the number of people (2*n is the total number of prisoners)
+#        strategy = 1/2/3 (choose one of strategies you want to investigate from three strategy)
+#        nreps = the number of replicate simulations to run in order to estimate the probability (10000 is a reasonable default)
+# Output: the estimated probability of all prisoners finding their number, so that all are released, according to nreps repeat times, when using the strategy=1/2/3 .
+Pall <- function(n, strategy, nreps){
+  # create a prisoners list to record the prisoners number
+  prisoners <- sample(1:(2*n), size = 2*n, replace = FALSE)
+  
+  # count the number of the success that all prisoners finding their number out of nreps
+  count_success = 0
+  
+  for (i in 1:nreps) {
+    # every repeat time change the distribution of the card number
+    card <- sample(1:(2*n), size = 2*n, replace = FALSE)
+    
+    for (k in prisoners) {
+      # strategy 1
+      if (strategy == 1){
+        card_index = vector(length = n)
+        card_index[1] = k
+        times = 0
+        while (times < n) {
+          
+          if (card[card_index[times+1]] == prisoners[k]) {
+            count[k] = 1 
+            break
+          }
+          
+          else{ 
+            card_index[times+2] = card[card_index[times+1]]
+          }
+          times = times + 1 
+        }
+      }
+    }
+    
+  }
+}
+
+
+
+
+
 ```
 
