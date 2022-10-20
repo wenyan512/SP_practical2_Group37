@@ -1,24 +1,24 @@
-## Course title: Statistical Programming
-## Project name: Practical 2
-## Group number: 37
 ## Group Member: Enyan WU (s2303128),
 #                Huiyu WU (s2303136), 
 #                Xuantao LI (s1822046) 
 
+## Address of your github repo:
+# https://github.com/wenyan512/SP_practical2_Group37.git
+
 ## Group contribution:
-# Overall, the weights of contribution for each group member are fairly equal. We wrote
-# our own coding based on our personal understanding of these questions. We shared our 
-# ideas when anyone stick in somewhere and all of us enjoyed the teamwork. The final 
-# version upload now is the final work we all committed for.
+# Overall, the weights of contribution for each group member are fairly equal. 
+# We wrote our own coding based on our personal understanding of these questions. 
+# We shared our ideas when anyone stick in somewhere and all of us enjoyed the teamwork. 
+# The final version upload now is the final work we all committed for.
 
 ## Project introduction:
 # In this project, we used stochastic simulation to investigate a somewhat surprising 
-# probability puzzle, which is also known as the classic 2n prisoners problem. Here we 
-# conducted this investigation under three strategies and compared the corresponding 
-# probabilities derived to find if there are surprising results.After estimating the 
-# probabilities of going free (finding their numbers), our next step, which is also the 
-# core of our investigation, would be estimating the probability distribution of the 
-# number of steps needed to go free.
+# probability puzzle, which is also known as the classic 2n prisoners problem. 
+# Here we conducted this investigation under three strategies and compared the 
+# corresponding probabilities derived to find if there are surprising results.
+# After estimating the probabilities of going free (finding their numbers), 
+# our next step, which is also the core of our investigation, would be estimating 
+# the probability distribution of the number of steps needed to go free.
 
 # The set up of this puzzle is basically as follows: 
 # 2n prisoners each with unique numbers from 1 to 2n
