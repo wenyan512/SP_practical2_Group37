@@ -186,3 +186,10 @@ for (i in 1:nreps){
   }
 }
 print(count/nreps)
+
+
+hh=dloop(50,10000)
+#hist(hh,main="Final graph",xlab="Loop length",ylab="Frequency in 10000 times",xlim=c(0,1),col="darkmagenta",freq=FALSE)
+barplot(hh,main="Visualization of probability of each loop length",xlab='Loop length',ylab='Frequency in 10000 times',names.arg=c(1:100),col="red")
+
+
